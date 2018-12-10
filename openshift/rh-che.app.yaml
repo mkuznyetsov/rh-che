@@ -32,6 +32,10 @@ objects:
       port: 8080
       protocol: TCP
       targetPort: 8080
+    - name: metrics
+      port: 8087
+      protocol: TCP
+      targetPort: 8087
     selector:
       app: rhche
 - apiVersion: v1
@@ -47,6 +51,8 @@ objects:
     to:
       kind: Service
       name: rhche-host
+    port:
+      targetPort: http
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -78,6 +84,11 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: che-jsonrpc-max-pool-size
+                name: rhche
+          - name: CHE_CORS_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: che-cors-enabled
                 name: rhche
           - name: CHE_DEBUG_SERVER
             valueFrom:
@@ -262,6 +273,11 @@ objects:
               configMapKeyRef:
                 key: che-logs-sentry-level
                 name: rhche
+          - name: CHE_METRICS_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: che-metrics-enabled
+                name: rhche
           - name: CHE_MULTIUSER
             valueFrom:
               configMapKeyRef:
@@ -347,6 +363,11 @@ objects:
               configMapKeyRef:
                 key: workspace-storage
                 name: rhche
+          - name: CHE_WSAGENT_CORS_ALLOWED__ORIGINS
+            valueFrom:
+              configMapKeyRef:
+                key: che-wsagent-cors-allowed-origins
+                name: rhche
           - name: JAVA_OPTS
             valueFrom:
               configMapKeyRef:
@@ -392,6 +413,8 @@ objects:
           ports:
           - containerPort: 8080
             name: http
+          - containerPort: 8087
+            name: metrics
           - containerPort: 8000
             name: http-debug
           readinessProbe:
